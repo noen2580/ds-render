@@ -1,0 +1,68 @@
+{
+ "kind": "product",
+ "id": 9023,
+ "code": 9023,
+ "title": "루이본 튐방지 손톱깎이",
+ "name": "777 루이본 모노톤 부드럽게 잘리는 튐방지 튼튼한 고급 손톱깎이",
+ "short_name": "루이본 튐방지 손톱깎이",
+ "product_category": "생활용품/손발톱관리",
+ "source": "test",
+ "image": "https://image14.coupangcdn.com/image/retail/images/936620072629326-dc581b4a-f51e-43c1-825f-525ab250fded.jpg",
+ "product_data": "[{\"productImage\": \"https://image14.coupangcdn.com/image/retail/images/936620072629326-dc581b4a-f51e-43c1-825f-525ab250fded.jpg\", \"productName\": \"777 루이본 튐방지 손톱깎이\"}]",
+ "shorts_script": {
+  "hook": {
+   "screen": {
+    "headline": "손톱 조각 튀죠?",
+    "sub": ""
+   },
+   "say": "깎을 때마다 손톱 조각이 튀죠?"
+  },
+  "points": [
+   {
+    "screen": {
+     "headline": "튐방지 커버",
+     "sub": ""
+    },
+    "say": "이건 이름부터 튐방지 손톱깎이예요."
+   },
+   {
+    "screen": {
+     "headline": "모노톤 디자인",
+     "sub": ""
+    },
+    "say": "깔끔한 모노톤이라 어디 둬도 무난해요."
+   }
+  ],
+  "answer": {
+   "screen": {
+    "headline": "이런 분께",
+    "sub": ""
+   },
+   "say": "바닥 청소가 귀찮은 분께 맞아요.",
+   "options": [
+    {
+     "if": "조각 튐이 싫다",
+     "then": "튐방지형"
+    },
+    {
+     "if": "디자인도 본다",
+     "then": "모노톤"
+    }
+   ]
+  },
+  "cta": {
+   "screen": {
+    "headline": "프로필 링크",
+    "sub": ""
+   },
+   "say": "프로필 링크에서 번호로 찾으세요."
+  },
+  "hook_scene": "Close-up of a hand resting on a white tissue on a light beige table, with several thin translucent pale off-white crescent-shaped fingernail clippings (keratin, matte, not metal) scattered on the tissue next to the fingertips; a finger points at the scattered clippings",
+  "meta": {
+   "code": 9023,
+   "category": "생활용품/손발톱관리",
+   "kind": "product",
+   "format": "problem"
+  }
+ }
+}

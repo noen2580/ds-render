@@ -1,0 +1,8 @@
+__pycache__/
+node_modules/
+worker/remotion_shorts/out/
+worker/longform_music/out/
+worker/longform_music/state/
+worker/youtube_shorts/credentials/
+*.pyc
+.env

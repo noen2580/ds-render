@@ -1,0 +1,202 @@
+[
+  {
+    "id": "own01_sunny_ukulele",
+    "file": "own01_sunny_ukulele.mp3",
+    "title": "own01_sunny_ukulele",
+    "artist": "DSPORTAL",
+    "license": "own",
+    "own": true,
+    "prompt": "cheerful ukulele, light acoustic guitar, soft hand claps, glockenspiel, sunny, happy lifestyle vlog, 112 bpm, instrumental",
+    "model": "ACE-Step-v1-3.5B"
+  },
+  {
+    "id": "own02_cozy_lofi",
+    "file": "own02_cozy_lofi.mp3",
+    "title": "own02_cozy_lofi",
+    "artist": "DSPORTAL",
+    "license": "own",
+    "own": true,
+    "prompt": "lofi hip hop, warm electric piano, soft drums, mellow bass, cozy home morning, 84 bpm, instrumental",
+    "model": "ACE-Step-v1-3.5B"
+  },
+  {
+    "id": "own03_marimba_pop",
+    "file": "own03_marimba_pop.mp3",
+    "title": "own03_marimba_pop",
+    "artist": "DSPORTAL",
+    "license": "own",
+    "own": true,
+    "prompt": "upbeat pop, marimba lead, plucky synth, light percussion, fresh and clean, commercial, 118 bpm, instrumental",
+    "model": "ACE-Step-v1-3.5B"
+  },
+  {
+    "id": "own04_funky_kitchen",
+    "file": "own04_funky_kitchen.mp3",
+    "title": "own04_funky_kitchen",
+    "artist": "DSPORTAL",
+    "license": "own",
+    "own": true,
+    "prompt": "light funk, slap bass, rhythmic guitar, tight drums, playful, cooking video, 105 bpm, instrumental",
+    "model": "ACE-Step-v1-3.5B"
+  },
+  {
+    "id": "own05_bossa_cafe",
+    "file": "own05_bossa_cafe.mp3",
+    "title": "own05_bossa_cafe",
+    "artist": "DSPORTAL",
+    "license": "own",
+    "own": true,
+    "prompt": "bossa nova, nylon guitar, soft shaker, brushed drums, relaxed cafe, 96 bpm, instrumental",
+    "model": "ACE-Step-v1-3.5B"
+  },
+  {
+    "id": "own06_bright_synthpop",
+    "file": "own06_bright_synthpop.mp3",
+    "title": "own06_bright_synthpop",
+    "artist": "DSPORTAL",
+    "license": "own",
+    "own": true,
+    "prompt": "bright synth pop, sparkling arpeggios, punchy kick, positive, modern product showcase, 120 bpm, instrumental",
+    "model": "ACE-Step-v1-3.5B"
+  },
+  {
+    "id": "own07_whistle_folk",
+    "file": "own07_whistle_folk.mp3",
+    "title": "own07_whistle_folk",
+    "artist": "DSPORTAL",
+    "license": "own",
+    "own": true,
+    "prompt": "happy whistling melody, acoustic guitar strumming, tambourine, carefree, daily life, 108 bpm, instrumental",
+    "model": "ACE-Step-v1-3.5B"
+  },
+  {
+    "id": "own08_chill_house",
+    "file": "own08_chill_house.mp3",
+    "title": "own08_chill_house",
+    "artist": "DSPORTAL",
+    "license": "own",
+    "own": true,
+    "prompt": "chill house, soft piano chords, deep bass, smooth hi-hats, calm energy, 116 bpm, instrumental",
+    "model": "ACE-Step-v1-3.5B"
+  },
+  {
+    "id": "own09_toy_piano",
+    "file": "own09_toy_piano.mp3",
+    "title": "own09_toy_piano",
+    "artist": "DSPORTAL",
+    "license": "own",
+    "own": true,
+    "prompt": "cute toy piano, pizzicato strings, xylophone, light and bouncy, tidy room, 110 bpm, instrumental",
+    "model": "ACE-Step-v1-3.5B"
+  },
+  {
+    "id": "own10_indie_guitar",
+    "file": "own10_indie_guitar.mp3",
+    "title": "own10_indie_guitar",
+    "artist": "DSPORTAL",
+    "license": "own",
+    "own": true,
+    "prompt": "indie pop, clean electric guitar riff, bass, upbeat drums, youthful, weekend errands, 124 bpm, instrumental",
+    "model": "ACE-Step-v1-3.5B"
+  },
+  {
+    "id": "own11_jazz_hop",
+    "file": "own11_jazz_hop.mp3",
+    "title": "own11_jazz_hop",
+    "artist": "DSPORTAL",
+    "license": "own",
+    "own": true,
+    "prompt": "jazz hop, muted trumpet, upright bass, vinyl crackle, laid back, 88 bpm, instrumental",
+    "model": "ACE-Step-v1-3.5B"
+  },
+  {
+    "id": "own12_tropical",
+    "file": "own12_tropical.mp3",
+    "title": "own12_tropical",
+    "artist": "DSPORTAL",
+    "license": "own",
+    "own": true,
+    "prompt": "tropical house, steel drum, soft synth pads, light percussion, breezy summer, 110 bpm, instrumental",
+    "model": "ACE-Step-v1-3.5B"
+  },
+  {
+    "id": "own13_clean_corporate",
+    "file": "own13_clean_corporate.mp3",
+    "title": "own13_clean_corporate",
+    "artist": "DSPORTAL",
+    "license": "own",
+    "own": true,
+    "prompt": "light corporate pop, piano and acoustic guitar, soft strings, optimistic, clean, 115 bpm, instrumental",
+    "model": "ACE-Step-v1-3.5B"
+  },
+  {
+    "id": "own14_retro_funk",
+    "file": "own14_retro_funk.mp3",
+    "title": "own14_retro_funk",
+    "artist": "DSPORTAL",
+    "license": "own",
+    "own": true,
+    "prompt": "retro 70s disco funk, wah guitar, groovy bass, handclaps, fun, 112 bpm, instrumental",
+    "model": "ACE-Step-v1-3.5B"
+  },
+  {
+    "id": "own15_morning_acoustic",
+    "file": "own15_morning_acoustic.mp3",
+    "title": "own15_morning_acoustic",
+    "artist": "DSPORTAL",
+    "license": "own",
+    "own": true,
+    "prompt": "gentle acoustic guitar fingerpicking, soft glockenspiel, warm, fresh morning routine, 100 bpm, instrumental",
+    "model": "ACE-Step-v1-3.5B"
+  },
+  {
+    "id": "own16_future_bass_soft",
+    "file": "own16_future_bass_soft.mp3",
+    "title": "own16_future_bass_soft",
+    "artist": "DSPORTAL",
+    "license": "own",
+    "own": true,
+    "prompt": "soft future bass, bright chords, gentle vocal chops without words, uplifting, 125 bpm, instrumental",
+    "model": "ACE-Step-v1-3.5B"
+  },
+  {
+    "id": "own17_quirky_pizzicato",
+    "file": "own17_quirky_pizzicato.mp3",
+    "title": "own17_quirky_pizzicato",
+    "artist": "DSPORTAL",
+    "license": "own",
+    "own": true,
+    "prompt": "quirky pizzicato strings, bassoon, light percussion, playful comedy, 104 bpm, instrumental",
+    "model": "ACE-Step-v1-3.5B"
+  },
+  {
+    "id": "own18_city_pop",
+    "file": "own18_city_pop.mp3",
+    "title": "own18_city_pop",
+    "artist": "DSPORTAL",
+    "license": "own",
+    "own": true,
+    "prompt": "city pop, electric piano, slap bass, smooth guitar, nostalgic, evening drive, 108 bpm, instrumental",
+    "model": "ACE-Step-v1-3.5B"
+  },
+  {
+    "id": "own19_hiphop_minimal",
+    "file": "own19_hiphop_minimal.mp3",
+    "title": "own19_hiphop_minimal",
+    "artist": "DSPORTAL",
+    "license": "own",
+    "own": true,
+    "prompt": "minimal hip hop beat, crisp snare, warm sub bass, simple piano motif, confident, 92 bpm, instrumental",
+    "model": "ACE-Step-v1-3.5B"
+  },
+  {
+    "id": "own20_clap_stomp",
+    "file": "own20_clap_stomp.mp3",
+    "title": "own20_clap_stomp",
+    "artist": "DSPORTAL",
+    "license": "own",
+    "own": true,
+    "prompt": "clap and stomp folk pop, acoustic guitar, handclaps, foot stomps, energetic, 122 bpm, instrumental",
+    "model": "ACE-Step-v1-3.5B"
+  }
+]

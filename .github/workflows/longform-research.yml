@@ -1,0 +1,91 @@
+# 장시간 수면 음악 — 유튜브 상위 영상 구조 조사(worker/longform_music/research.py).
+# 결과(summary.md, videos.csv, 썸네일 모음, gemini.json)는 longform-research 브랜치의 research/<날짜>/ 에 커밋한다.
+#
+# 시작: longform-run 브랜치의 worker/longform_music/research-request.json ({"name","gemini","queries"}) 을 바꿔 푸시.
+# 쿼터: 검색어 1개 × 2(조회수순·관련도순) × 100 = 200 유닛. 기본 14개 ≈ 2,800(하루 10,000, 쇼츠 업로드와 같이 씀).
+# 비용: --gemini N 은 영상당 Gemini 2.5 Flash 수 센트 미만(저해상도, 3분 분량).
+
+name: longform-research
+
+on:
+  push:
+    branches: [longform-run]
+    paths: [worker/longform_music/research-request.json]
+
+concurrency:
+  group: longform-research
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  research:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    defaults:
+      run:
+        working-directory: worker
+    steps:
+      - uses: actions/checkout@v4
+      - name: 설정
+        run: |
+          python3 - <<'PY'
+          import json, os, re
+          r = json.load(open("longform_music/research-request.json"))
+          name = str(r.get("name", "run"))
+          assert re.fullmatch(r"[A-Za-z0-9_-]{1,40}", name), "name 은 영문·숫자·-·_ 만"
+          q = str(r.get("queries", ""))
+          assert re.fullmatch(r"[0-9A-Za-z ,'-]*", q), "queries 형식"
+          with open(os.environ["GITHUB_ENV"], "a") as f:
+              f.write(f"NAME={name}\nGEMINI={int(r.get('gemini', 0))}\nQUERIES={q}\n")
+          PY
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+          cache: pip
+          cache-dependency-path: worker/requirements.txt
+      - name: 시스템 패키지
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg fonts-dejavu-core >/dev/null
+      - name: 의존성
+        run: pip install -q -r requirements.txt
+      - name: 유튜브 자격증명(Moonlit Hush 토큰 — 읽기만 한다)
+        env:
+          YT_CLIENT_ID: ${{ secrets.YT_CLIENT_ID }}
+          YT_CLIENT_SECRET: ${{ secrets.YT_CLIENT_SECRET }}
+          YT_REFRESH_TOKEN: ${{ secrets.SLEEP_YT_REFRESH_TOKEN }}
+        run: |
+          mkdir -p youtube_shorts/credentials
+          python3 - <<'PY'
+          import json, os
+          json.dump({"client_id": os.environ["YT_CLIENT_ID"], "client_secret": os.environ["YT_CLIENT_SECRET"],
+                     "refresh_token": os.environ["YT_REFRESH_TOKEN"], "token_uri": "https://oauth2.googleapis.com/token",
+                     "scopes": ["https://www.googleapis.com/auth/youtube.upload", "https://www.googleapis.com/auth/youtube"]},
+                    open("youtube_shorts/credentials/youtube_oauth.json", "w"))
+          PY
+      - name: 조사
+        env:
+          VERTEX_API_KEY: ${{ secrets.VERTEX_API_KEY }}
+          VERTEX_API_KEY_PROJECT: ${{ vars.VERTEX_API_KEY_PROJECT }}
+          VERTEX_PROJECT: ${{ vars.VERTEX_API_KEY_PROJECT }}
+        run: |
+          python longform_music/research.py --out "../research/$(date -u +%F)-$NAME" --gemini "$GEMINI" --queries "$QUERIES"
+          cat ../research/*-"$NAME"/summary.md >> "$GITHUB_STEP_SUMMARY"
+      - name: 결과를 longform-research 브랜치에 커밋
+        if: always()
+        working-directory: .
+        run: |
+          rm -rf worker/youtube_shorts/credentials
+          [ -d research ] || exit 0
+          mv research /tmp/research
+          git config user.name "longform-research"
+          git config user.email "actions@users.noreply.github.com"
+          if git ls-remote --exit-code origin longform-research >/dev/null; then
+            git fetch -q origin longform-research && git checkout -q -B longform-research FETCH_HEAD
+          else
+            git checkout -q --orphan longform-research && git rm -rq --cached . && git clean -fdxq
+          fi
+          mkdir -p research && cp -r /tmp/research/. research/
+          git add research && git commit -qm "research: $NAME" && git push -q origin longform-research
