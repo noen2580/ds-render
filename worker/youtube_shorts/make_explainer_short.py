@@ -332,7 +332,7 @@ def produce(post: dict, upload: bool = False, privacy: str = "private",
     out = {"post_id": pid, "video": str(video), "sheet": str(sheet), "issues": issues,
            "duration": manifest["totalDuration"],
            # CC BY 곡이면 저작자 표시가 의무다 — 교차 게시(Threads·릴스·틱톡) 캡션에도 붙도록 NAS 로 넘긴다.
-           "credit": built["credit"]}
+           "credit": built["credit"], "synthetic": built.get("synthetic", False)}
     if not upload or issues:
         return out
 

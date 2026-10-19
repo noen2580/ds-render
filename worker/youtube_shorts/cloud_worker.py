@@ -69,8 +69,10 @@ def one() -> bool:
     name, post = c["name"], c["job"]
     print(f"== {name} 시작 — {post.get('title', '')[:40]} (남은 큐 {c.get('remaining', 0)})")
     from make_explainer_short import produce
+    # 틱톡용 다시 렌더(2026-10-19): 유튜브에는 이미 올라가 있다 — 업로드 없이 렌더만 해 mp4 를 돌려준다.
+    tiktok_only = bool(post.get("tiktok_only"))
     try:
-        res = produce(post, upload=not DRY, privacy="public")
+        res = produce(post, upload=not DRY and not tiktok_only, privacy="public")
     except BaseException as e:                 # noqa: BLE001  (SystemExit 렌더 실패 포함)
         err = f"{type(e).__name__}: {e}"
         print(f"!! {name} 실패 — {err}")
@@ -90,6 +92,16 @@ def one() -> bool:
         print(f"== {name} 렌더·검사 통과(DRY_RUN) — 큐에 되돌림")
         call("POST", f"/release/{name}")
         return False
+    if tiktok_only:
+        if post.get("require_veo") and not res.get("synthetic"):
+            # 움직이는 장면 없이 정지 카드만 나온 영상이 틱톡에서 지워졌다 — 옛 영상을 그대로 두게 실패로 알린다.
+            print(f"!! {name} Veo 장면 없음 — 틱톡용 영상을 바꾸지 않는다")
+            report(name, "failed", {"error": "Veo 장면 없음", "tiktok_only": True})
+            return True
+        report(name, "done", {**(post.get("keep") or {}), "tiktok_only": True,
+                              **{k: res.get(k) for k in ("duration", "credit")}}, video=res["video"])
+        print(f"== {name} 틱톡용 렌더 완료(유튜브 업로드 없음)")
+        return True
     report(name, "done", {k: res.get(k) for k in ("video_id", "url", "privacy", "duration", "credit")},
            video=res["video"])
     print(f"== {name} 완료 — {res.get('url')}")
