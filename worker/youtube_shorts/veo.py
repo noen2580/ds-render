@@ -13,7 +13,8 @@
 - 이 클립을 쓴 영상은 유튜브 업로드 때 '합성 콘텐츠'로 표시한다(make_explainer_short.produce).
 
 호출 경로 두 가지 (2026-10-07)
-- **Vertex AI**(우선): GCP 크레딧이 Vertex AI(프로젝트 dsportal-491115)에 있어서 이쪽으로 부른다.
+- **Vertex AI**(우선): 제미나이 프로젝트(gen-lang-client-0948415395)를 깃헙 시크릿 GEMINI_API_KEY 로 부른다
+  (2026-10-19 Somi — dsportal-491115 는 결제가 꺼져 있어 쓰지 않는다).
   인증은 ① 워크로드 아이덴티티(권장, 키 파일 없음 — 워크플로의 google-github-actions/auth 가
   GOOGLE_APPLICATION_CREDENTIALS 를 만든다) 또는 GCP_SA_KEY(서비스 계정 JSON) ② VERTEX_API_KEY
   (프로젝트는 VERTEX_API_KEY_PROJECT) — 앞의 것이 실패하면(결제 꺼짐 등) 다음 것을 시도한다.
@@ -94,7 +95,7 @@ def _vertex_auths() -> list[tuple[dict, str]]:
     """시도할 (헤더, 프로젝트) 목록. 서비스 계정 JSON 또는 워크로드 아이덴티티(ADC) 토큰 → API 키 순.
     API 키는 키를 만든 프로젝트로 불러야 해서 VERTEX_API_KEY_PROJECT(없으면 VERTEX_PROJECT)를 쓴다."""
     out: list[tuple[dict, str]] = []
-    project = os.environ.get("VERTEX_PROJECT", "")
+    project = os.environ.get("VERTEX_PROJECT", "").strip()     # 붙여 넣을 때 딸려 온 줄바꿈이 주소를 깨뜨렸다(2026-10-19)
     raw = os.environ.get("GCP_SA_KEY", "")
     if raw or os.environ.get("GOOGLE_APPLICATION_CREDENTIALS"):
         try:
@@ -116,10 +117,10 @@ def _vertex_auths() -> list[tuple[dict, str]]:
     # API 키(에이전트 플랫폼 전용으로 제한된 키 포함). 프로젝트를 안 주면 키만으로 부르는
     # 익스프레스 경로(global, 프로젝트 없음)를 쓴다. GEMINI_API_KEY 도 같은 식으로 한 번 시도한다.
     seen = set()
-    for k in (os.environ.get("VERTEX_API_KEY", ""), os.environ.get("GEMINI_API_KEY", "")):
+    for k in (os.environ.get("VERTEX_API_KEY", "").strip(), os.environ.get("GEMINI_API_KEY", "").strip()):
         if k and k not in seen:
             seen.add(k)
-            out.append(({"x-goog-api-key": k}, os.environ.get("VERTEX_API_KEY_PROJECT") or project))
+            out.append(({"x-goog-api-key": k}, os.environ.get("VERTEX_API_KEY_PROJECT", "").strip() or project))
     return out
 
 
@@ -129,7 +130,11 @@ def _vertex(scene: str, out: Path, seconds: int, c, image: dict | None = None) -
         if "x-goog-api-key" in h and project:
             tries.append("")                    # 키는 프로젝트 경로가 막히면 익스프레스 경로로 한 번 더
         for p in tries:
-            got = _vertex_call(h, p, scene, out, seconds, c, image)
+            try:
+                got = _vertex_call(h, p, scene, out, seconds, c, image)
+            except Exception as e:              # noqa: BLE001 — 한 경로가 깨져도 다음 경로를 시도한다
+                print(f"  Veo(Vertex) 실패: {type(e).__name__}: {e}")
+                got = None
             if got:
                 return got
     return None

@@ -30,7 +30,6 @@ concurrency:
 
 permissions:
   contents: read
-  id-token: write      # 워크로드 아이덴티티(Vertex AI) — 키 파일 없이 GCP 토큰을 받는다
 
 env:
   WORKER_API: https://track.dsportal.io/api/worker
@@ -102,14 +101,6 @@ jobs:
                     open("youtube_shorts/credentials/youtube_oauth.json", "w"))
           EOF
 
-      - name: GCP 인증(워크로드 아이덴티티, Veo용)
-        continue-on-error: true      # 실패해도 Veo 만 꺼지고 사진으로 렌더한다
-        uses: google-github-actions/auth@v2
-        with:
-          # 비밀 아님 — dsportal-491115(번호 719749673425)의 풀 github/공급자 ds-blog, Vertex AI 사용자 권한만 가진 계정.
-          workload_identity_provider: ${{ vars.GCP_WIF_PROVIDER || 'projects/719749673425/locations/global/workloadIdentityPools/github/providers/ds-blog' }}
-          service_account: ${{ vars.GCP_SA_EMAIL || 'shorts-veo@dsportal-491115.iam.gserviceaccount.com' }}
-
       - name: 렌더·업로드
         env:
           WORKER_TOKEN: ${{ secrets.WORKER_TOKEN }}
@@ -117,11 +108,12 @@ jobs:
           MAX_JOBS: ${{ inputs.max_jobs || '3' }}
           REMOTION_CONCURRENCY: "100%"
           # 상품 쇼츠 훅의 '불편한 상황' 장면(Veo). 시크릿이 없으면 사진만으로 만든다(youtube_shorts/veo.py).
-          # 크레딧이 있는 Vertex AI(dsportal-491115)를 먼저 쓰고, 없으면 Gemini API.
+          # 제미나이 프로젝트(gen-lang-client-0948415395)의 Vertex AI 를 제미나이 키로 부르고, 안 되면 Gemini API.
+          # dsportal-491115 는 Veo 에 쓰지 않는다(2026-10-19 Somi — 결제가 꺼져 있어 403).
           GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
-          VERTEX_API_KEY: ${{ secrets.VERTEX_API_KEY }}
+          VERTEX_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           VERTEX_API_KEY_PROJECT: ${{ vars.VERTEX_API_KEY_PROJECT }}
-          VERTEX_PROJECT: ${{ vars.VERTEX_PROJECT || 'dsportal-491115' }}
+          VERTEX_PROJECT: ${{ vars.VERTEX_API_KEY_PROJECT || 'gen-lang-client-0948415395' }}
           VEO_VERTEX_MODEL: ${{ vars.VEO_VERTEX_MODEL }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           VEO_MODEL: ${{ vars.VEO_MODEL }}
