@@ -140,6 +140,17 @@ def _vertex(scene: str, out: Path, seconds: int, c, image: dict | None = None) -
     return None
 
 
+# 2026-10-20 #78: Vertex 가 "high load"(code 8)로 한 번 거절해 Veo 없이 정지 카드로 나갔다. 일시 오류라
+# 잠시 뒤 다시 하면 대개 된다(다음 영상 #79 는 같은 설정으로 성공).
+BUSY_RETRIES = 2
+BUSY_WAIT = 45
+
+
+def _busy(err) -> bool:
+    code = err.get("code") if isinstance(err, dict) else None
+    return code in (8, 14) or "high load" in str(err).lower()
+
+
 def _vertex_call(h: dict, project: str, scene: str, out: Path, seconds: int, c,
                  image: dict | None = None) -> Path | None:
     loc = os.environ.get("VERTEX_LOCATION") or "us-central1"
@@ -155,6 +166,18 @@ def _vertex_call(h: dict, project: str, scene: str, out: Path, seconds: int, c,
     body = {"instances": [inst],
             "parameters": {"aspectRatio": "9:16", "durationSeconds": seconds, "sampleCount": 1,
                            "generateAudio": False}}
+    for attempt in range(BUSY_RETRIES + 1):
+        got = _vertex_once(h, base, body, out, seconds, c)
+        if got != "busy":
+            return got
+        if attempt < BUSY_RETRIES:
+            print(f"  Veo(Vertex) 혼잡 — {BUSY_WAIT}s 뒤 다시({attempt + 1}/{BUSY_RETRIES})")
+            time.sleep(BUSY_WAIT)
+    return None
+
+
+def _vertex_once(h: dict, base: str, body: dict, out: Path, seconds: int, c):
+    """요청 한 번. 성공하면 경로, 구글 쪽 혼잡(일시 오류)이면 "busy", 그 밖의 실패는 None."""
     models = [os.environ["VEO_VERTEX_MODEL"]] if os.environ.get("VEO_VERTEX_MODEL") else list(VERTEX_MODELS)
     name = model = ""
     for model in models:
@@ -182,7 +205,7 @@ def _vertex_call(h: dict, project: str, scene: str, out: Path, seconds: int, c,
         return None
     if op.get("error"):
         print(f"  Veo(Vertex) 오류: {str(op['error'])[:300]}")
-        return None
+        return "busy" if _busy(op["error"]) else None
     videos = (op.get("response") or {}).get("videos") or []
     b64 = (videos[0] if videos else {}).get("bytesBase64Encoded")
     if not b64:
