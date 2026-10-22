@@ -552,3 +552,24 @@ def test_localize_limits_and_fallback(mods):
     assert sorted(ok) == ["ja", "ko"] and bad == ["hi"] and "hi" not in puts[-1]["localizations"]
     ok, bad = mods.upload.update_localized(yt, "a", {"title": "A"}, {"ko": three["ko"]})
     assert bad == [] and len(puts) == 5                                           # 거절 없으면 한 번에
+
+
+def test_scheduled_job_survives_late_cron_and_runs_once():
+    import datetime as dt
+    import cadence
+    U = dt.timezone.utc
+    st = dict(cadence.SEED)
+    # 목요일 17:00 회차가 다음 날(UTC 금요일)에 돌아도 그 회차다 — 예전엔 '월·목이 아니다'로 건너뛰었다.
+    late = cadence.scheduled_job(st, dt.datetime(2026, 10, 23, 8, 0, tzinfo=U))
+    assert late["job"] == "forest-003" and late["slot"] == "2026-10-22"
+    assert cadence.scheduled_job(st, dt.datetime(2026, 10, 22, 10, 0, tzinfo=U)) is None     # 회차 전
+    assert cadence.scheduled_job(st, dt.datetime(2026, 10, 24, 1, 0, tzinfo=U)) is None      # 30시간 지남
+    assert cadence.scheduled_job({**st, "last_slot": "2026-10-22"},
+                                 dt.datetime(2026, 10, 22, 23, 0, tzinfo=U)) is None         # 이미 올림
+
+
+def test_mark_records_slot(tmp_path, monkeypatch):
+    import cadence
+    monkeypatch.setenv("LONGFORM_STATE", str(tmp_path))
+    st = cadence.mark("forest-003", "2026-10-22")
+    assert st["forest"] == 3 and st["last_slot"] == "2026-10-22"

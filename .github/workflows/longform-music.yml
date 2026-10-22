@@ -25,7 +25,7 @@ on:
   workflow_dispatch:
     inputs:
       job:
-        description: "작업 이름(같은 이름이면 이어서). 예: sleep-001"
+        description: "작업 이름(같은 이름이면 이어서). 예: sleep-001 — auto 면 이번 정기 회차(이미 올렸으면 건너뜀)"
         required: true
       hours:
         description: "영상 길이(시간)"
@@ -45,8 +45,11 @@ on:
     paths: [worker/longform_music/run-request.json]
   # 정기 제작(Somi 2026-10-15 '주 2편'): 월·목 17:00 UTC(화·금 02:00 KST). 한 주에 한 테마 두 편, 두 번째 편 뒤에
   # 6시간 모음이 자동으로 붙는다(run.py next_job). 테마별 마지막 번호는 캐시 longform-state-* 에 둔다.
+  # 2026-10-23: 예약이 4시간 넘게 밀리거나(10/19) 아예 안 돌았다(10/22). 예비 시각을 여러 개 두고, 같은 회차는
+  # plan 이 한 번만 만든다(cadence.scheduled_job — 올리고 나면 last_slot 이 남는다). NAS 도 회차 시각에 job=auto 로 깨운다.
   schedule:
-    - cron: "0 17 * * 1,4"
+    - cron: "0 17,20,23 * * 1,4"
+    - cron: "0 3,8 * * 2,5"
 
 concurrency:
   group: longform-music
@@ -56,7 +59,35 @@ permissions:
   contents: read
 
 jobs:
+  plan:
+    runs-on: ubuntu-latest
+    outputs:
+      req: ${{ steps.p.outputs.req }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: worker/longform_music
+      - uses: actions/cache/restore@v4
+        with:
+          path: worker/longform_music/state
+          key: longform-state-${{ github.run_id }}
+          restore-keys: longform-state-
+      - id: p
+        env:
+          EV: ${{ github.event_name }}
+          IN_JOB: ${{ inputs.job }}
+        run: |
+          if [ "$EV" = schedule ] || { [ "$EV" = workflow_dispatch ] && [ "$IN_JOB" = auto ]; }; then
+            req=$(python3 worker/longform_music/cadence.py)
+            echo "정기 제작: $req"
+          else
+            req='{"manual": true}'
+          fi
+          echo "req=$req" >> "$GITHUB_OUTPUT"
+
   make:
+    needs: plan
+    if: needs.plan.outputs.req != '{}'
     runs-on: ubuntu-latest
     timeout-minutes: 300
     env:
@@ -81,16 +112,13 @@ jobs:
           IN_COST: ${{ inputs.max_cost }}
           IN_REJECT: ${{ inputs.reject }}
           IN_UPLOAD: ${{ inputs.upload }}
+          PLAN: ${{ needs.plan.outputs.req }}
         run: |
           python3 - <<'PY'
           import json, os, re
-          if os.environ["GITHUB_EVENT_NAME"] == "schedule":
-              import datetime, sys
-              sys.path.insert(0, "longform_music")
-              from cadence import load_state, next_job
-              now = datetime.datetime.now(datetime.timezone.utc)
-              r = next_job(load_state(), now.isocalendar()[1], now.weekday())
-              assert r, "정기 제작 요일(월·목)이 아니다"
+          plan = json.loads(os.environ.get("PLAN") or "{}")
+          if plan.get("job"):                                # 정기 제작(plan 이 회차·번호를 골랐다)
+              r = plan
               print("정기 제작:", r)
           elif os.environ["GITHUB_EVENT_NAME"] == "push":
               r = json.load(open("longform_music/run-request.json"))
@@ -228,6 +256,8 @@ jobs:
             ${UPLOAD:+--upload}
       - name: 테마별 번호 남기기
         if: success() && env.ONLY == '' && env.FROM == '' && env.UPLOAD == '1'
+        env:
+          LONGFORM_SLOT: ${{ fromJSON(needs.plan.outputs.req).slot || '' }}
         run: python longform_music/run.py mark --job "$JOB"
       - name: 테마별 번호 저장
         if: success() && env.ONLY == '' && env.FROM == '' && env.UPLOAD == '1'

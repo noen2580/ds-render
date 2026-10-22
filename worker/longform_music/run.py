@@ -447,7 +447,7 @@ def cmd_seo(a) -> dict:
 def cmd_mark(a) -> dict | None:
     """정기 제작용: 올린 작업의 테마별 번호를 남긴다."""
     import cadence
-    st = cadence.mark(a.job)
+    st = cadence.mark(a.job, os.environ.get("LONGFORM_SLOT", ""))
     print(f"테마별 번호: {st}")
     return st
 
