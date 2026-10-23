@@ -281,9 +281,13 @@ def product_meta(post: dict, script: dict, linkinbio_url: str, credit: str) -> t
     code = int(post["code"])
     cat = (post.get("product_category") or "").split("/")[0]
     hook = script["hook"]["screen"]["headline"]
-    title = f"{hook} | #{code} {post.get('short_name') or cat}"[:95]
+    # 2026-10-23 플랫폼 기준: 제목의 '#번호'는 해시태그가 된다 → '12번'. 휴대폰 쇼츠는 제목 앞 40자 남짓만 보인다 —
+    # 훅 다음에 상품 이름(검색어)을 둔다.
+    title = f"{hook} | {post.get('short_name') or cat} {code}번"[:95]
+    name = post.get("short_name") or cat
     lines = [
         script["hook"]["say"].rstrip("."),
+        f"{name} — 영상 속 {code}번 상품" if name else "",
         "",
         f"▸ 영상 속 상품: {post.get('name', '')[:80]}",
         f"▸ 채널 프로필 링크에서 #{code} 번을 찾으세요 — {linkinbio_url}#{code}",
@@ -295,7 +299,8 @@ def product_meta(post: dict, script: dict, linkinbio_url: str, credit: str) -> t
     if credit:
         lines += ["", credit]
     tags_cat = [t for t in re.split(r"[/·\s]+", post.get("product_category") or "") if t]
-    lines += ["", " ".join(f"#{t}" for t in (["살림템", "쿠팡추천", "생활꿀템"] + tags_cat)[:6])]
+    # 설명란 해시태그 앞 3개가 제목 위에 뜬다 — #Shorts·상품군·쿠팡추천 세 개만.
+    lines += ["", " ".join(f"#{t}" for t in list(dict.fromkeys(["Shorts"] + tags_cat[:1] + ["쿠팡추천"]))[:3])]
     tags = ["살림템", "쿠팡추천", "생활용품", "추천템", "Shorts"] + tags_cat
     return title, NL.join(lines), tags
 
