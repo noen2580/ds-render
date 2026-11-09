@@ -29,3 +29,4 @@ def test_상품쇼츠_제목에_번호_해시태그를_쓰지_않는다():
     tags = [w for w in desc.split() if w.startswith("#") and not w[1:].isdigit()]
     assert tags[:3] == ["#Shorts", "#생활용품", "#쿠팡추천"] and len(tags) == 3
     assert desc.splitlines()[1].startswith("문풍지 테이프")
+    assert "t.me/somsom1128" in desc

@@ -274,6 +274,8 @@ def qa(manifest: dict, video: Path, sheet: Path) -> list[str]:
 
 # 도메인 인지도(2026-10-15) — ds-commerce modules/content/brand.LINE 과 같은 문구. 워커는 그 모듈 없이 돈다.
 BRAND_LINE = "📖 고르는 기준·비교 정리는 dsportal.io"
+# 2026-11-09 Somi: 각 플랫폼에 텔레그램 핫딜 채널 초대. 쇼츠 설명란 URL 은 눌리지 않아 글자로 남긴다.
+TELEGRAM_LINE = "🔔 매일 쿠팡 특가 알림은 텔레그램 t.me/somsom1128"
 
 
 def product_meta(post: dict, script: dict, linkinbio_url: str, credit: str) -> tuple[str, str, list]:
@@ -292,6 +294,7 @@ def product_meta(post: dict, script: dict, linkinbio_url: str, credit: str) -> t
         f"▸ 영상 속 상품: {post.get('name', '')[:80]}",
         f"▸ 채널 프로필 링크에서 #{code} 번을 찾으세요 — {linkinbio_url}#{code}",
         BRAND_LINE,
+        TELEGRAM_LINE,
         "",
         "이 영상은 쿠팡 파트너스 활동의 일환으로, 이에 따른 일정액의 수수료를 제공받습니다.",
         "가격·재고·할인은 시점에 따라 달라질 수 있습니다.",
